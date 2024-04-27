@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  go-sentry:
+    container_name: go-sentry
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - default
+    volumes:
+      - ./:/app
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: sentry
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    networks:
+      - default
+
+networks:
+  default:
+volumes:
+  postgres_data:
